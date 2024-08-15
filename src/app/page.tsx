@@ -1,19 +1,131 @@
-import Image from "next/image";
+'use client'
+
+import { useCallback, useEffect, useState, useMemo } from 'react'
+
+import Image from 'next/image'
+import Logo from './logo.svg'
+
+import styles from './styles.module.css'
+
+const STREAM_URL = 'https://18093.live.streamtheworld.com/SP_R4830056.aac'
 
 export default function Home() {
+  const [player, setPlayer] = useState<HTMLAudioElement>()
+  const [isReady, setIsReady] = useState(false)
+  const [status, setStatus] = useState<
+    'playing' | 'paused' | 'waiting' | 'stalled'
+  >()
+  const [volume, setVolume] = useState(0.5)
+
+  useEffect(() => {
+    if (player) {
+      console.log('volume is ' + volume)
+      player.volume = volume
+    }
+  }, [volume])
+
+  useEffect(() => {
+    const playerInstance = new Audio(STREAM_URL)
+
+    playerInstance.addEventListener('canplaythrough', (event) => {
+      setIsReady(true)
+    })
+
+    playerInstance.addEventListener('play', (event) => {
+      console.log('Playing')
+      setStatus('playing')
+    })
+
+    playerInstance.addEventListener('pause', (event) => {
+      console.log('paused')
+      setStatus('paused')
+    })
+
+    setPlayer(playerInstance)
+  }, [])
+
+  const handlePlay = useCallback(() => {
+    if (!player || !isReady) {
+      return
+    }
+
+    if (!status) {
+      player.play()
+    } else if (status === 'playing') {
+      player.pause()
+    } else if (status === 'paused') {
+      player.play()
+    } else {
+      return
+    }
+  }, [player, isReady, status])
+
+  const playLabel = useMemo(() => {
+    switch (status) {
+      case 'playing':
+        return 'Pause'
+      case undefined:
+        return isReady ? 'Play' : 'Loading..'
+      default:
+        return 'Play'
+    }
+  }, [status, isReady])
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Coming soon...
-        </p>
-      </div>
+    <div className={styles.component}>
+      <header className={styles.header}>
+        <div className={styles.logo}>
+          <Logo width={250} height={69} viewBox="0 0 411 113" />
+        </div>
 
-      <div className="relative z-[-1] flex place-items-center before:absolute before:h-[300px] before:w-full before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 sm:before:w-[480px] sm:after:w-[240px] before:lg:h-[360px]">
-        <h1 className="text-7xl font-bold">VIBE RADIO</h1>
-      </div>
+        <div className={styles.player}>
+          <div className={styles.controlWrapper}>
+            <div className={styles.buttons}>
+              {/* <div className={styles.control}>prev</div> */}
 
-      <div />
-    </main>
-  );
+              <div className={styles.control} onClick={handlePlay}>
+                {playLabel}
+              </div>
+
+              {/* <div className={styles.control}>next</div> */}
+            </div>
+
+            <div className={styles.volume}>
+              <div className={styles.slideContainer}>
+                <div
+                  className={styles.slideStatus}
+                  style={{
+                    width: `${volume * 100}%`,
+                  }}
+                />
+                <input
+                  id="volume"
+                  className={styles.volumeSlide}
+                  type="range"
+                  min="1"
+                  max="100"
+                  value={volume * 100}
+                  onChange={(e) => setVolume(Number(e.target.value) / 100)}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* <main className={styles.content}>
+        <nav className={styles.navigation}>
+          <ul className={styles.navList}>
+            <li className={styles.navListItem}>Music</li>
+            <li className={styles.navListItem}>Radio</li>
+            <li className={styles.navListItem}>Artist</li>
+            <li className={styles.navListItem}>Shop</li>
+            <li className={styles.navListItem}>About</li>
+          </ul>
+        </nav>
+
+        <div className={styles.contentContainer}></div>
+      </main> */}
+    </div>
+  )
 }
