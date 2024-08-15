@@ -2,8 +2,11 @@
 
 import { useCallback, useEffect, useState, useMemo } from 'react'
 
-import Image from 'next/image'
 import Logo from './logo.svg'
+import Inst from './inst.svg'
+import Play from './play.svg'
+import Pause from './pause.svg'
+import Loading from './loading.svg'
 
 import styles from './styles.module.css'
 
@@ -63,11 +66,15 @@ export default function Home() {
   const playLabel = useMemo(() => {
     switch (status) {
       case 'playing':
-        return 'Pause'
+        return <Pause width={30} height={40} viewBox="0 0 6 8" />
       case undefined:
-        return isReady ? 'Play' : 'Loading..'
+        return isReady ? (
+          <Play width={30} height={35} viewBox="0 0 6 7" />
+        ) : (
+          <Loading width={41} />
+        )
       default:
-        return 'Play'
+        return <Play width={30} height={35} viewBox="0 0 6 7" />
     }
   }, [status, isReady])
 
@@ -92,12 +99,14 @@ export default function Home() {
 
             <div className={styles.volume}>
               <div className={styles.slideContainer}>
-                <div
-                  className={styles.slideStatus}
-                  style={{
-                    width: `${volume * 100}%`,
-                  }}
-                />
+                <div className={styles.slideStatusContainer}>
+                  <div
+                    className={styles.slideStatus}
+                    style={{
+                      width: `${volume * 100}%`,
+                    }}
+                  />
+                </div>
                 <input
                   id="volume"
                   className={styles.volumeSlide}
@@ -112,6 +121,16 @@ export default function Home() {
           </div>
         </div>
       </header>
+
+      <div className={styles.socials}>
+        <a
+          href="https://www.instagram.com/holypartygroup"
+          target="_blank"
+          className={styles.socialItem}
+        >
+          <Inst width={24} viewBox="0 0 48 48" />
+        </a>
+      </div>
 
       {/* <main className={styles.content}>
         <nav className={styles.navigation}>
