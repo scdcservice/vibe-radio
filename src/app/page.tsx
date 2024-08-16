@@ -1,82 +1,93 @@
-'use client'
+'use client';
 
-import { useCallback, useEffect, useState, useMemo } from 'react'
+import { useCallback, useEffect, useState, useMemo } from 'react';
+import useSWR from 'swr';
 
-import Logo from './logo.svg'
-import Inst from './inst.svg'
-import Play from './play.svg'
-import Pause from './pause.svg'
-import Loading from './loading.svg'
+import Logo from './logo.svg';
+import Inst from './inst.svg';
+import Play from './play.svg';
+import Pause from './pause.svg';
+import Loading from './loading.svg';
 
-import styles from './styles.module.css'
+import styles from './styles.module.css';
 
-const STREAM_URL = 'https://18093.live.streamtheworld.com/SP_R4830056.aac'
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
+const STREAM_URL = 'https://18093.live.streamtheworld.com/SP_R4830056.aac';
 
 export default function Home() {
-  const [player, setPlayer] = useState<HTMLAudioElement>()
-  const [isReady, setIsReady] = useState(false)
+  const [player, setPlayer] = useState<HTMLAudioElement>();
+  const [isReady, setIsReady] = useState(false);
   const [status, setStatus] = useState<
     'playing' | 'paused' | 'waiting' | 'stalled'
-  >()
-  const [volume, setVolume] = useState(0.5)
+  >();
+  const [volume, setVolume] = useState(0.5);
+
+  const { data, error, isLoading } = useSWR(
+    'https://vibe-backend-yp2q.onrender.com/player/track',
+    fetcher,
+    { refreshInterval: 1000 }
+  );
+
+  console.log(data);
 
   useEffect(() => {
     if (player) {
-      console.log('volume is ' + volume)
-      player.volume = volume
+      console.log('volume is ' + volume);
+      player.volume = volume;
     }
-  }, [volume])
+  }, [volume]);
 
   useEffect(() => {
-    const playerInstance = new Audio(STREAM_URL)
+    const playerInstance = new Audio(STREAM_URL);
 
     playerInstance.addEventListener('canplaythrough', (event) => {
-      setIsReady(true)
-    })
+      setIsReady(true);
+    });
 
     playerInstance.addEventListener('play', (event) => {
-      console.log('Playing')
-      setStatus('playing')
-    })
+      console.log('Playing');
+      setStatus('playing');
+    });
 
     playerInstance.addEventListener('pause', (event) => {
-      console.log('paused')
-      setStatus('paused')
-    })
+      console.log('paused');
+      setStatus('paused');
+    });
 
-    setPlayer(playerInstance)
-  }, [])
+    setPlayer(playerInstance);
+  }, []);
 
   const handlePlay = useCallback(() => {
     if (!player || !isReady) {
-      return
+      return;
     }
 
     if (!status) {
-      player.play()
+      player.play();
     } else if (status === 'playing') {
-      player.pause()
+      player.pause();
     } else if (status === 'paused') {
-      player.play()
+      player.play();
     } else {
-      return
+      return;
     }
-  }, [player, isReady, status])
+  }, [player, isReady, status]);
 
   const playLabel = useMemo(() => {
     switch (status) {
       case 'playing':
-        return <Pause width={30} height={40} viewBox="0 0 6 8" />
+        return <Pause width={30} height={40} viewBox="0 0 6 8" />;
       case undefined:
         return isReady ? (
           <Play width={30} height={35} viewBox="0 0 6 7" />
         ) : (
           <Loading width={41} />
-        )
+        );
       default:
-        return <Play width={30} height={35} viewBox="0 0 6 7" />
+        return <Play width={30} height={35} viewBox="0 0 6 7" />;
     }
-  }, [status, isReady])
+  }, [status, isReady]);
 
   return (
     <div className={styles.component}>
@@ -95,6 +106,11 @@ export default function Home() {
               </div>
 
               {/* <div className={styles.control}>next</div> */}
+            </div>
+
+            <div className={styles.trackInfo}>
+              <h2>{isLoading ? '...' : data?.artist}</h2>
+              <h3>{isLoading ? '...' : data?.title}</h3>
             </div>
 
             <div className={styles.volume}>
@@ -146,5 +162,5 @@ export default function Home() {
         <div className={styles.contentContainer}></div>
       </main> */}
     </div>
-  )
+  );
 }
