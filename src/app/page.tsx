@@ -10,8 +10,14 @@ import Pause from './pause.svg';
 import Loading from './loading.svg';
 
 import styles from './styles.module.css';
+import Image from 'next/image';
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+const fetcher = (url: string) =>
+  fetch(url, {
+    headers: {
+      'Content-Type': 'json',
+    },
+  }).then((res) => res.json());
 
 const STREAM_URL = 'https://18093.live.streamtheworld.com/SP_R4830056.aac';
 
@@ -21,12 +27,14 @@ export default function Home() {
   const [status, setStatus] = useState<
     'playing' | 'paused' | 'waiting' | 'stalled'
   >();
-  const [volume, setVolume] = useState(0.5);
+  const [volume, setVolume] = useState(1);
 
   const { data, error, isLoading } = useSWR(
     'https://vibe-backend-yp2q.onrender.com/player/track',
     fetcher,
-    { refreshInterval: 1000 }
+    {
+      refreshInterval: 1000,
+    }
   );
 
   console.log(data);
@@ -36,7 +44,7 @@ export default function Home() {
       console.log('volume is ' + volume);
       player.volume = volume;
     }
-  }, [volume]);
+  }, [player, volume]);
 
   useEffect(() => {
     const playerInstance = new Audio(STREAM_URL);
@@ -109,8 +117,25 @@ export default function Home() {
             </div>
 
             <div className={styles.trackInfo}>
-              <h2>{isLoading ? '...' : data?.artist}</h2>
-              <h3>{isLoading ? '...' : data?.title}</h3>
+              {data?.coverArt && (
+                <div className={styles.trackCover}>
+                  <Image
+                    src={data.coverArt}
+                    width={48}
+                    height={48}
+                    alt={data?.title}
+                  />
+                </div>
+              )}
+
+              <div className={styles.trackText}>
+                <h2 className={styles.trackArtist}>
+                  {isLoading ? '...' : data?.artist}
+                </h2>
+                <h3 className={styles.trackTitle}>
+                  {isLoading ? '...' : data?.title}
+                </h3>
+              </div>
             </div>
 
             <div className={styles.volume}>
