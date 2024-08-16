@@ -2,15 +2,16 @@
 
 import { useCallback, useEffect, useState, useMemo } from 'react';
 import useSWR from 'swr';
+import Image from 'next/image';
 
 import Logo from './logo.svg';
 import Inst from './inst.svg';
+import SoundCloud from './soundcloud.svg';
 import Play from './play.svg';
 import Pause from './pause.svg';
 import Loading from './loading.svg';
 
 import styles from './styles.module.css';
-import Image from 'next/image';
 
 const fetcher = (url: string) =>
   fetch(url, {
@@ -36,8 +37,6 @@ export default function Home() {
       refreshInterval: 1000,
     }
   );
-
-  console.log(data);
 
   useEffect(() => {
     if (player) {
@@ -85,15 +84,15 @@ export default function Home() {
   const playLabel = useMemo(() => {
     switch (status) {
       case 'playing':
-        return <Pause width={30} height={40} viewBox="0 0 6 8" />;
+        return <Pause width={18} height={24} viewBox="0 0 6 8" />;
       case undefined:
         return isReady ? (
-          <Play width={30} height={35} viewBox="0 0 6 7" />
+          <Play width={18} height={21} viewBox="0 0 6 7" />
         ) : (
-          <Loading width={41} />
+          <Loading width={28} />
         );
       default:
-        return <Play width={30} height={35} viewBox="0 0 6 7" />;
+        return <Play width={18} height={21} viewBox="0 0 6 7" />;
     }
   }, [status, isReady]);
 
@@ -107,34 +106,30 @@ export default function Home() {
         <div className={styles.player}>
           <div className={styles.controlWrapper}>
             <div className={styles.buttons}>
-              {/* <div className={styles.control}>prev</div> */}
+              <div className={styles.trackInfo}>
+                {data?.coverArt && (
+                  <div className={styles.trackCover}>
+                    <Image
+                      src={data.coverArt}
+                      width={48}
+                      height={48}
+                      alt={data?.title}
+                    />
+                  </div>
+                )}
+
+                <div className={styles.trackText}>
+                  <h2 className={styles.trackArtist}>
+                    {isLoading ? '...' : data?.artist}
+                  </h2>
+                  <h3 className={styles.trackTitle}>
+                    {isLoading ? '...' : data?.title}
+                  </h3>
+                </div>
+              </div>
 
               <div className={styles.control} onClick={handlePlay}>
                 {playLabel}
-              </div>
-
-              {/* <div className={styles.control}>next</div> */}
-            </div>
-
-            <div className={styles.trackInfo}>
-              {data?.coverArt && (
-                <div className={styles.trackCover}>
-                  <Image
-                    src={data.coverArt}
-                    width={48}
-                    height={48}
-                    alt={data?.title}
-                  />
-                </div>
-              )}
-
-              <div className={styles.trackText}>
-                <h2 className={styles.trackArtist}>
-                  {isLoading ? '...' : data?.artist}
-                </h2>
-                <h3 className={styles.trackTitle}>
-                  {isLoading ? '...' : data?.title}
-                </h3>
               </div>
             </div>
 
@@ -171,21 +166,15 @@ export default function Home() {
         >
           <Inst width={24} viewBox="0 0 48 48" />
         </a>
+
+        <a
+          href="https://soundcloud.com/vibeonlineradio"
+          target="_blank"
+          className={styles.socialItem}
+        >
+          <SoundCloud width={24} viewBox="0 0 48 48" />
+        </a>
       </div>
-
-      {/* <main className={styles.content}>
-        <nav className={styles.navigation}>
-          <ul className={styles.navList}>
-            <li className={styles.navListItem}>Music</li>
-            <li className={styles.navListItem}>Radio</li>
-            <li className={styles.navListItem}>Artist</li>
-            <li className={styles.navListItem}>Shop</li>
-            <li className={styles.navListItem}>About</li>
-          </ul>
-        </nav>
-
-        <div className={styles.contentContainer}></div>
-      </main> */}
     </div>
   );
 }
