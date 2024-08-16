@@ -217,6 +217,9 @@
   transition: 0.15s background-color ease;
   color: #2a2a2a;
   margin-left: 16px;
+  outline: none;
+  border: none;
+  box-shadow: none;
 }
 
 .control:hover {

@@ -21,22 +21,16 @@ const fetcher = (url: string) =>
   }).then((res) => res.json());
 
 const STREAM_URL = 'https://18093.live.streamtheworld.com/SP_R4830056.mp3';
+const TRACK_API = 'https://vibe-backend-yp2q.onrender.com/player/track';
 
 export default function Home() {
   const [player, setPlayer] = useState<HTMLAudioElement>();
-  const [isReady, setIsReady] = useState(false);
-  const [status, setStatus] = useState<
-    'playing' | 'paused' | 'waiting' | 'stalled'
-  >();
+  const [status, setStatus] = useState<'playing' | 'paused' | 'idle'>('idle');
   const [volume, setVolume] = useState(1);
 
-  const { data, error, isLoading } = useSWR(
-    'https://vibe-backend-yp2q.onrender.com/player/track',
-    fetcher,
-    {
-      refreshInterval: 1000,
-    }
-  );
+  const { data, error, isLoading } = useSWR(TRACK_API, fetcher, {
+    refreshInterval: 1000,
+  });
 
   useEffect(() => {
     if (player) {
@@ -47,10 +41,6 @@ export default function Home() {
 
   useEffect(() => {
     const playerInstance = new Audio(STREAM_URL);
-
-    playerInstance.addEventListener('canplaythrough', (event) => {
-      setIsReady(true);
-    });
 
     playerInstance.addEventListener('play', (event) => {
       console.log('Playing');
@@ -66,35 +56,31 @@ export default function Home() {
   }, []);
 
   const handlePlay = useCallback(() => {
-    if (!player || !isReady) {
+    if (!player) {
       return;
     }
 
-    if (!status) {
-      player.play();
-    } else if (status === 'playing') {
-      player.pause();
-    } else if (status === 'paused') {
-      player.play();
-    } else {
-      return;
+    switch (status) {
+      case 'idle':
+      case 'paused':
+        player.play();
+        break;
+      case 'playing':
+        player.pause();
+        break;
+      default:
+        break;
     }
-  }, [player, isReady, status]);
+  }, [player, status]);
 
   const playLabel = useMemo(() => {
     switch (status) {
       case 'playing':
         return <Pause width={18} height={24} viewBox="0 0 6 8" />;
-      case undefined:
-        return isReady ? (
-          <Play width={18} height={21} viewBox="0 0 6 7" />
-        ) : (
-          <Loading width={28} />
-        );
       default:
         return <Play width={18} height={21} viewBox="0 0 6 7" />;
     }
-  }, [status, isReady]);
+  }, [status]);
 
   return (
     <div className={styles.component}>
@@ -128,9 +114,9 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className={styles.control} onClick={handlePlay}>
+              <button className={styles.control} onClick={handlePlay}>
                 {playLabel}
-              </div>
+              </button>
             </div>
 
             <div className={styles.volume}>
