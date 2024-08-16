@@ -88,6 +88,7 @@
   max-width: 100%;
   display: flex;
   justify-content: center;
+  align-items: center;
   margin-bottom: 35px;
 }
 
@@ -249,7 +250,7 @@
 
 .trackInfo {
   display: flex;
-  justify-content: center;
+  align-items: center;
   max-width: calc(100% - 48px - 16px);
 }
 
