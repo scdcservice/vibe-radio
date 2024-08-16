@@ -9,7 +9,7 @@ import Inst from './inst.svg';
 import SoundCloud from './soundcloud.svg';
 import Play from './play.svg';
 import Pause from './pause.svg';
-import Loading from './loading.svg';
+import NoImage from './noimage.svg';
 
 import styles from './styles.module.css';
 
@@ -93,16 +93,18 @@ export default function Home() {
           <div className={styles.controlWrapper}>
             <div className={styles.buttons}>
               <div className={styles.trackInfo}>
-                {data?.coverArt && (
-                  <div className={styles.trackCover}>
+                <div className={styles.trackCover}>
+                  {!data?.coverArt ? (
                     <Image
                       src={data.coverArt}
                       width={48}
                       height={48}
                       alt={data?.title}
                     />
-                  </div>
-                )}
+                  ) : (
+                    <NoImage width={22} height={21} viewBox="0 0 43 41" />
+                  )}
+                </div>
 
                 <div className={styles.trackText}>
                   <h2 className={styles.trackArtist}>
