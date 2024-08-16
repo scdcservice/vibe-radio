@@ -249,10 +249,8 @@
 
 .trackInfo {
   display: flex;
-  align-items: center;
   justify-content: center;
   max-width: calc(100% - 48px - 16px);
-  /* margin-bottom: 35px; */
 }
 
 .trackText {
