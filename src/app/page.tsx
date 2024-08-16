@@ -20,7 +20,7 @@ const fetcher = (url: string) =>
     },
   }).then((res) => res.json());
 
-const STREAM_URL = 'https://18093.live.streamtheworld.com/SP_R4830056.aac';
+const STREAM_URL = 'https://18093.live.streamtheworld.com/SP_R4830056.mp3';
 
 export default function Home() {
   const [player, setPlayer] = useState<HTMLAudioElement>();
