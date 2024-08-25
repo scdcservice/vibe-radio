@@ -10,7 +10,7 @@ import Pause from './pause.svg';
 
 import styles from './AudioPlayer.module.css';
 
-const STREAM_URL = 'https://18093.live.streamtheworld.com/SP_R4830056.mp3';
+const STREAM_URL = 'https://s62.radiolize.com/radio/8060/radio.mp3';
 
 export const AudioPlayer = () => {
   const { status, volume, setVolume, onPlay } = useAudioPlayer(STREAM_URL);

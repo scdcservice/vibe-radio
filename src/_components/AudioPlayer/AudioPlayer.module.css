@@ -128,6 +128,10 @@
   cursor: pointer;
 }
 
+.control:first-child {
+  margin-left: 0;
+}
+
 .control:not(:last-child) {
   margin-right: 25px;
 }
