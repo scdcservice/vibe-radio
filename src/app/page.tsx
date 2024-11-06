@@ -20,7 +20,7 @@ export default function Home() {
 
       <div className={styles.socials}>
         <a
-          href="https://www.instagram.com/holypartygroup"
+          href="https://www.instagram.com/vibe.streetculture/"
           target="_blank"
           className={styles.socialItem}
         >
